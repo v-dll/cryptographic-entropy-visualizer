@@ -1,0 +1,2217 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" class="h-full">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, viewport-fit=cover" />
+  <title>Pathy x Khaled Wahdan | Password Entropy Calculator</title>
+  <meta name="description"
+    content="An interactive password entropy and brute-force time estimator, built natively into the Pathy platform by Khaled Wahdan." />
+  <meta name="theme-color" content="#f8fafc" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+
+  <!-- Pathy SVG gradient (verbatim from pathy.live source) -->
+  <svg aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden">
+    <defs>
+      <linearGradient id="pathy-grad" x1="53" y1="379.8" x2="487.9" y2="43.67" gradientUnits="userSpaceOnUse">
+        <stop offset="0.08" stop-color="#00D0B8"></stop>
+        <stop offset="0.27" stop-color="#4ECCCA"></stop>
+        <stop offset="0.56" stop-color="#42B0E7"></stop>
+        <stop offset="0.82" stop-color="#3B9FF8"></stop>
+        <stop offset="1" stop-color="#399AFF"></stop>
+      </linearGradient>
+    </defs>
+  </svg>
+
+  <style>
+    /* ============================================================
+       PATHY DESIGN SYSTEM — extracted from pathy.live production CSS
+    ============================================================ */
+    :root {
+      --font-display: "Baloo Bhaijaan 2", system-ui, sans-serif;
+      --font-sans: "Baloo Bhaijaan 2", system-ui, sans-serif;
+
+      --color-primary-100: #eaf2ff;
+      --color-primary-200: #bbd3ff;
+      --color-primary-300: #6fa8ff;
+      --color-primary-400: #397ced;
+      --color-primary-500: #1f5fcc;
+      --color-primary-600: #0f3e8a;
+
+      --color-secondary-100: #e6fffb;
+      --color-secondary-200: #b2f5ea;
+      --color-secondary-300: #5fe3d6;
+      --color-secondary-400: #00d0b8;
+      --color-secondary-500: #00a896;
+      --color-secondary-600: #007f73;
+
+      --color-achievement-100: #dbccff;
+      --color-achievement-500: #8b5cf6;
+      --color-achievement-600: #612cdd;
+
+      --color-warning-100: #ffecb3;
+      --color-warning-200: #ffe082;
+      --color-warning-300: #ffd54f;
+      --color-warning-700: #e65100;
+
+      --color-danger-50: #fdecec;
+      --color-danger-100: #f9caca;
+      --color-danger-500: #e53935;
+      --color-danger-600: #d32f2f;
+
+      --color-neutral-0: #ffffff;
+      --color-neutral-100: #f8fafc;
+      --color-neutral-200: #f5f7fa;
+      --color-neutral-300: #d6dee6;
+      --color-neutral-400: #9fb3c8;
+      --color-neutral-500: #5c7a99;
+      --color-neutral-600: #001d3d;
+
+      --color-mint: #00d0b8;
+      --color-mint-deep: #007f73;
+      --color-action: #2f70e0;
+      --color-action-deep: #1f5fcc;
+      --color-ink: #001d3d;
+      --color-brand-text: var(--color-primary-500);
+
+      --color-bg: var(--color-neutral-100);
+      --color-surface: var(--color-neutral-0);
+      --color-surface-muted: var(--color-neutral-200);
+      --color-border: var(--color-neutral-300);
+      --color-text: var(--color-neutral-600);
+      --color-text-muted: var(--color-neutral-500);
+      --color-text-subtle: var(--color-neutral-400);
+
+      --radius-xs: 2px;
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+
+      --shadow-xs: 0 1px 4px 0 rgba(0, 0, 0, 0.032);
+      --shadow-sm: 0 2px 8px 0 rgba(0, 0, 0, 0.040), 0 1px 2px 0 rgba(0, 0, 0, 0.032);
+      --shadow-md: 0 6px 20px 0 rgba(0, 0, 0, 0.059), 0 2px 8px 0 rgba(0, 0, 0, 0.032);
+      --shadow-lg: 0 16px 40px 0 rgba(0, 0, 0, 0.090), 0 6px 14px 0 rgba(0, 0, 0, 0.040);
+      --shadow-xl: 0 24px 56px 0 rgba(0, 0, 0, 0.12), 0 10px 22px 0 rgba(0, 0, 0, 0.06);
+
+      --ease-out: cubic-bezier(0, 0, 0.2, 1);
+      --header-h: 5.5rem;
+    }
+
+    /* ── Dark mode ──────────────────────────────────────────── */
+    [data-theme="dark"] {
+      --color-bg: #10141a;
+      --color-surface: #151b24;
+      --color-surface-muted: #1a2130;
+      --color-border: #2a3445;
+      --color-text: #e2eaf4;
+      --color-text-muted: #8fa8c0;
+      --color-text-subtle: #4a6278;
+      --color-neutral-0: #151b24;
+      --color-neutral-100: #10141a;
+      --color-neutral-200: #1a2130;
+      --color-neutral-300: #2a3445;
+      --color-neutral-600: #e2eaf4;
+    }
+
+    /* ── Reset ──────────────────────────────────────────────── */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      border: 0 solid;
+    }
+
+    html {
+      font-size: 16px;
+      -webkit-text-size-adjust: 100%;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--color-bg);
+      color: var(--color-text);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      transition: background-color 0.3s var(--ease-out), color 0.3s var(--ease-out);
+    }
+
+    a {
+      color: inherit;
+      text-decoration: inherit;
+    }
+
+    img,
+    svg,
+    video {
+      display: block;
+    }
+
+    button,
+    input {
+      font: inherit;
+      color: inherit;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    input {
+      border-radius: 0;
+    }
+
+    ul,
+    ol {
+      list-style: none;
+    }
+
+    sup {
+      font-size: 0.7em;
+      vertical-align: super;
+    }
+
+    /* ── Main Content Fade Transition ────────────────────────── */
+    .fade-content {
+      transition: opacity 0.3s var(--ease-out);
+      opacity: 1;
+    }
+
+    .fade-content.faded {
+      opacity: 0;
+    }
+
+    /* ── Card ───────────────────────────────────────────────── */
+    .card {
+      background-color: var(--color-surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      transition: box-shadow 0.25s var(--ease-out), transform 0.25s var(--ease-out);
+    }
+
+    [data-theme="dark"] .card {
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    /* ── Button ─────────────────────────────────────────────── */
+    .btn {
+      --btn-bg: var(--color-action);
+      --btn-fg: #ffffff;
+      background: var(--btn-bg);
+      color: var(--btn-fg);
+      border-radius: var(--radius-md);
+      min-height: 44px;
+      padding: 0 1.25rem;
+      font-weight: 700;
+      font-size: 1rem;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      box-shadow: var(--shadow-xs);
+      transition: background-color 0.2s var(--ease-out), box-shadow 0.2s var(--ease-out), transform 0.18s var(--ease-out);
+      cursor: pointer;
+      border: 1px solid transparent;
+      text-decoration: none;
+    }
+
+    .btn:hover {
+      --btn-bg: var(--color-action-deep);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn:active {
+      transform: translateY(1px) scale(0.97);
+    }
+
+    .btn--ghost {
+      --btn-bg: var(--color-surface);
+      --btn-fg: var(--color-brand-text);
+      border-color: var(--color-primary-400);
+      box-shadow: none;
+    }
+
+    .btn--ghost:hover {
+      --btn-bg: var(--color-primary-100);
+      box-shadow: none;
+    }
+
+    .focus-ring:focus-visible {
+      outline: 2px solid var(--color-primary-400);
+      outline-offset: 2px;
+    }
+
+    /* ── Layout ─────────────────────────────────────────────── */
+    .section-padding {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+
+    @media (min-width: 640px) {
+      .section-padding {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .section-padding {
+        padding-left: 6.25rem;
+        padding-right: 6.25rem;
+      }
+    }
+
+    .max-w-content {
+      max-width: 64rem;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* ============================================================
+       NAVBAR
+    ============================================================ */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      height: var(--header-h);
+      display: flex;
+      align-items: center;
+    }
+
+    .site-nav {
+      position: relative;
+      display: flex;
+      flex: 1;
+      min-width: 0;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      height: var(--header-h);
+      border-bottom: 1px solid var(--color-border);
+      background-color: rgba(248, 250, 252, 0.65);
+      padding: 0 1rem;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      transition: background-color 0.3s var(--ease-out);
+    }
+
+    [data-theme="dark"] .site-nav {
+      background-color: rgba(16, 20, 26, 0.72);
+    }
+
+    @media (min-width: 640px) {
+      .site-nav {
+        padding: 0 1.5rem;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .site-nav {
+        padding: 0 5rem;
+      }
+    }
+
+    /* ── LOGO ──── */
+    .nav-logo {
+      display: inline-flex;
+      height: 3rem;
+      flex-shrink: 0;
+      align-items: center;
+      border-radius: var(--radius-sm);
+      gap: 0.625rem;
+    }
+
+    .nav-logo-svg {
+      height: 2.625rem;
+      width: auto;
+    }
+
+    .nav-title {
+      font-family: var(--font-display);
+      font-weight: 300;
+      font-size: 0.8125rem;
+      color: var(--color-text-subtle);
+      white-space: nowrap;
+      letter-spacing: 0.01em;
+      display: none;
+    }
+
+    @media (min-width: 460px) {
+      .nav-title {
+        display: block;
+      }
+    }
+
+    .nav-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      flex-shrink: 0;
+    }
+
+    /* Icon-button base */
+    .icon-btn {
+      display: inline-grid;
+      height: 2.625rem;
+      width: 2.625rem;
+      flex-shrink: 0;
+      place-items: center;
+      border-radius: 50%;
+      color: var(--color-text-muted);
+      transition: background-color 0.15s, color 0.15s;
+      border: none;
+    }
+
+    .icon-btn:hover {
+      background-color: var(--color-surface-muted);
+      color: var(--color-brand-text);
+    }
+
+    /* Language toggle pill */
+    .lang-toggle {
+      display: inline-flex;
+      align-items: center;
+      height: 2.25rem;
+      padding: 0 0.75rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--color-text-muted);
+      border: 1.5px solid var(--color-border);
+      background: var(--color-surface);
+      transition: all 0.2s var(--ease-out);
+      gap: 0.25rem;
+      cursor: pointer;
+    }
+
+    .lang-toggle:hover {
+      border-color: var(--color-primary-400);
+      color: var(--color-brand-text);
+      background: var(--color-primary-100);
+    }
+
+    .lang-toggle .lang-sep {
+      opacity: 0.35;
+    }
+
+    .lang-toggle .lang-active {
+      color: var(--color-brand-text);
+      font-weight: 800;
+    }
+
+    /* About nav button */
+    .about-nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+      height: 2.25rem;
+      padding: 0 0.875rem;
+      border-radius: 999px;
+      font-size: 0.8125rem;
+      font-weight: 700;
+      color: var(--color-text-muted);
+      border: 1.5px solid var(--color-border);
+      background: var(--color-surface);
+      transition: all 0.2s var(--ease-out);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .about-nav-btn:hover {
+      border-color: var(--color-secondary-300);
+      color: var(--color-secondary-600);
+      background: var(--color-secondary-100);
+    }
+
+    .about-nav-btn svg {
+      width: 0.875rem;
+      height: 0.875rem;
+    }
+
+    /* ============================================================
+       HERO SECTION
+    ============================================================ */
+    .hero-section {
+      position: relative;
+      padding: 4rem 0 3rem;
+      overflow: hidden;
+    }
+
+    @media (min-width: 640px) {
+      .hero-section {
+        padding: 5rem 0 4rem;
+      }
+    }
+
+    .hero-glow {
+      pointer-events: none;
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: -5.5rem;
+      height: 31.5rem;
+      opacity: 0.7;
+      background:
+        radial-gradient(20% 30% at 50% -2%, rgba(187, 211, 255, 0.85), transparent 72%),
+        radial-gradient(32% 46% at 50% 16%, rgba(187, 211, 255, 0.58), transparent 74%),
+        radial-gradient(50% 42% at 50% 44%, rgba(187, 211, 255, 0.42), transparent 74%),
+        radial-gradient(72% 32% at 50% 72%, rgba(187, 211, 255, 0.18), transparent 76%);
+    }
+
+    @media (min-width: 640px) {
+      .hero-glow {
+        height: 47.5rem;
+      }
+    }
+
+    [data-theme="dark"] .hero-glow {
+      opacity: 0.3;
+    }
+
+    .grain::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.35;
+      z-index: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23g)' opacity='0.04'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-size: 120px 120px;
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 10;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.375rem 0.875rem;
+      background-color: var(--color-secondary-100);
+      border: 1px solid var(--color-secondary-200);
+      border-radius: 999px;
+      font-size: 0.8125rem;
+      font-weight: 700;
+      color: var(--color-secondary-600);
+      margin-bottom: 1.5rem;
+    }
+
+    [data-theme="dark"] .hero-badge {
+      background-color: rgba(0, 168, 150, 0.15);
+      border-color: rgba(0, 168, 150, 0.3);
+      color: var(--color-secondary-400);
+    }
+
+    .github-promo-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.375rem 0.875rem;
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 999px;
+      font-size: 0.8125rem;
+      font-weight: 700;
+      color: var(--color-text);
+      text-decoration: none;
+      box-shadow: var(--shadow-xs);
+      transition: all 0.2s var(--ease-out);
+    }
+
+    .github-promo-link:hover {
+      border-color: var(--color-text-subtle);
+      background-color: var(--color-surface-muted);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    [data-theme="dark"] .github-promo-link {
+      background-color: rgba(255, 255, 255, 0.03);
+    }
+
+    .hero-badge-dot {
+      width: 0.5rem;
+      height: 0.5rem;
+      border-radius: 50%;
+      background-color: var(--color-mint);
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse-dot {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.6;
+        transform: scale(0.8);
+      }
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.75rem, 4vw + 0.5rem, 3rem);
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: -0.025em;
+      color: var(--color-neutral-600);
+      margin-bottom: 1.25rem;
+    }
+
+    [data-theme="dark"] .hero-title {
+      color: var(--color-text);
+    }
+
+    .hero-title span {
+      display: block;
+    }
+
+    .brand-gradient {
+      background: linear-gradient(90deg, var(--color-primary-400), var(--color-secondary-400));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-subtitle {
+      font-size: clamp(0.9375rem, 1.5vw + 0.5rem, 1.125rem);
+      color: var(--color-text-muted);
+      line-height: 1.75;
+      max-width: 42rem;
+      margin-bottom: 2.5rem;
+    }
+
+    /* ============================================================
+       PASSWORD INPUT
+    ============================================================ */
+    .input-wrapper {
+      position: relative;
+      margin-bottom: 1.75rem;
+    }
+
+    .input-label {
+      display: block;
+      font-size: 0.8125rem;
+      font-weight: 700;
+      color: var(--color-text-subtle);
+      margin-bottom: 0.5rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .password-field-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .password-input {
+      width: 100%;
+      min-height: 3.5rem;
+      padding: 0 3.5rem 0 1.25rem;
+      font-size: 1.0625rem;
+      font-weight: 500;
+      background-color: var(--color-surface);
+      border: 1.5px solid var(--color-border);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-xs);
+      color: var(--color-text);
+      outline: none;
+      transition: border-color 0.2s var(--ease-out), box-shadow 0.2s var(--ease-out);
+      letter-spacing: 0.06em;
+    }
+
+    /* RTL: swap icon padding side */
+    [dir="rtl"] .password-input {
+      padding: 0 1.25rem 0 3.5rem;
+    }
+
+    .password-input::placeholder {
+      color: var(--color-text-subtle);
+      letter-spacing: 0;
+    }
+
+    .password-input:focus {
+      border-color: var(--color-primary-400);
+      box-shadow: 0 0 0 3px rgba(57, 124, 237, 0.15), var(--shadow-sm);
+    }
+
+    .toggle-visibility {
+      position: absolute;
+      right: 0.875rem;
+      display: inline-grid;
+      place-items: center;
+      width: 2rem;
+      height: 2rem;
+      color: var(--color-text-subtle);
+      border-radius: 50%;
+      transition: color 0.15s;
+      border: none;
+    }
+
+    [dir="rtl"] .toggle-visibility {
+      right: auto;
+      left: 0.875rem;
+    }
+
+    .toggle-visibility:hover {
+      color: var(--color-brand-text);
+    }
+
+    /* ============================================================
+       CHARACTER SET BADGES
+    ============================================================ */
+    .charset-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .charset-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border: 1.5px solid;
+      transition: all 0.25s var(--ease-out);
+      user-select: none;
+    }
+
+    .charset-badge .bdot {
+      width: 0.375rem;
+      height: 0.375rem;
+      border-radius: 50%;
+      background-color: currentColor;
+    }
+
+    .charset-badge.inactive {
+      background-color: var(--color-surface-muted);
+      border-color: var(--color-border);
+      color: var(--color-text-subtle);
+    }
+
+    .badge-lower {
+      background-color: var(--color-primary-100);
+      border-color: var(--color-primary-300);
+      color: var(--color-primary-600);
+    }
+
+    .badge-upper {
+      background-color: var(--color-secondary-100);
+      border-color: var(--color-secondary-300);
+      color: var(--color-secondary-600);
+    }
+
+    .badge-number {
+      background-color: var(--color-warning-100);
+      border-color: var(--color-warning-300);
+      color: var(--color-warning-700);
+    }
+
+    .badge-symbol {
+      background-color: #f1ebff;
+      border-color: var(--color-achievement-100);
+      color: var(--color-achievement-600);
+    }
+
+    /* ============================================================
+       STRENGTH PROGRESS BAR
+    ============================================================ */
+    .strength-section {
+      margin-bottom: 1.25rem;
+    }
+
+    .strength-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .strength-label-text {
+      font-size: 0.8125rem;
+      font-weight: 700;
+      color: var(--color-text-subtle);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .strength-name {
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      padding: 0.2rem 0.625rem;
+      border-radius: 999px;
+      transition: background-color 0.3s var(--ease-out), color 0.3s var(--ease-out);
+      background-color: var(--color-surface-muted);
+      color: var(--color-text-subtle);
+    }
+
+    .sn-very-weak {
+      background-color: #e53935;
+      color: #ffffff;
+    }
+
+    .sn-weak {
+      background-color: #f57f17;
+      color: #ffffff;
+    }
+
+    .sn-fair {
+      background-color: #f9a825;
+      color: #1a1a1a;
+    }
+
+    .sn-strong {
+      background-color: #007f73;
+      color: #ffffff;
+    }
+
+    .sn-very-strong {
+      background-color: #1f5fcc;
+      color: #ffffff;
+    }
+
+    .progress-track {
+      height: 0.625rem;
+      width: 100%;
+      background-color: var(--color-surface-muted);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.4s var(--ease-out);
+    }
+
+    .pf-very-weak {
+      background: #e53935;
+    }
+
+    .pf-weak {
+      background: #f57f17;
+    }
+
+    .pf-fair {
+      background: linear-gradient(90deg, #f57f17, #ffd54f);
+    }
+
+    .pf-strong {
+      background: linear-gradient(90deg, #00d0b8, #397ced);
+    }
+
+    .pf-very-strong {
+      background: linear-gradient(90deg, #1f5fcc, #00d0b8);
+    }
+
+    /* ============================================================
+       METRICS GRID
+    ============================================================ */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+
+    @media (min-width: 640px) {
+      .metrics-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+      }
+    }
+
+    .metric-card {
+      padding: 1.125rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.375rem;
+    }
+
+    .metric-icon {
+      width: 2rem;
+      height: 2rem;
+      border-radius: var(--radius-md);
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      margin-bottom: 0.125rem;
+    }
+
+    .metric-icon svg {
+      width: 1rem;
+      height: 1rem;
+    }
+
+    .metric-label {
+      font-size: 0.6875rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--color-text-subtle);
+    }
+
+    .metric-value {
+      font-family: var(--font-display);
+      font-size: clamp(1.25rem, 2.5vw, 1.875rem);
+      font-weight: 800;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+      transition: color 0.3s var(--ease-out);
+    }
+
+    .metric-sub {
+      font-size: 0.6875rem;
+      color: var(--color-text-subtle);
+      font-weight: 500;
+    }
+
+    .mc-blue .metric-icon {
+      background: var(--color-primary-100);
+      color: var(--color-primary-500);
+    }
+
+    .mc-mint .metric-icon {
+      background: var(--color-secondary-100);
+      color: var(--color-secondary-600);
+    }
+
+    .mc-amber .metric-icon {
+      background: var(--color-warning-100);
+      color: var(--color-warning-700);
+    }
+
+    .mc-purple .metric-icon {
+      background: #f1ebff;
+      color: var(--color-achievement-600);
+    }
+
+    .mc-blue .metric-value {
+      color: var(--color-primary-500);
+    }
+
+    .mc-mint .metric-value {
+      color: var(--color-secondary-600);
+    }
+
+    .mc-amber .metric-value {
+      color: var(--color-warning-700);
+    }
+
+    .mc-purple .metric-value {
+      color: var(--color-achievement-600);
+    }
+
+    /* ============================================================
+       TIME-TO-CRACK CARD
+    ============================================================ */
+    .crack-card {
+      background: linear-gradient(135deg, var(--color-primary-100) 0%, var(--color-secondary-100) 100%);
+      border-radius: var(--radius-lg);
+      padding: 1.375rem 1.5rem;
+      margin-bottom: 1.25rem;
+      border: 1px solid var(--color-primary-200);
+      display: flex;
+      flex-direction: column;
+      gap: 0.375rem;
+    }
+
+    [data-theme="dark"] .crack-card {
+      background: linear-gradient(135deg, rgba(31, 95, 204, 0.18) 0%, rgba(0, 168, 150, 0.14) 100%);
+      border-color: rgba(57, 124, 237, 0.22);
+    }
+
+    .crack-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-primary-500);
+    }
+
+    [data-theme="dark"] .crack-label {
+      color: var(--color-secondary-400);
+    }
+
+    .crack-value {
+      font-family: var(--font-display);
+      font-size: clamp(1.1rem, 2.5vw, 1.625rem);
+      font-weight: 800;
+      color: var(--color-neutral-600);
+      line-height: 1.3;
+    }
+
+    [data-theme="dark"] .crack-value {
+      color: var(--color-text);
+    }
+
+    .crack-rate {
+      font-size: 0.75rem;
+      color: var(--color-text-subtle);
+      font-weight: 500;
+    }
+
+    /* ============================================================
+       EXPLAINER CARDS
+    ============================================================ */
+    .explainer-card {
+      padding: 1.375rem 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .explainer-title {
+      font-family: var(--font-display);
+      font-size: 0.9375rem;
+      font-weight: 700;
+      color: var(--color-text);
+      margin-bottom: 0.875rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .etitle-icon {
+      width: 1.5rem;
+      height: 1.5rem;
+      background: var(--color-primary-100);
+      color: var(--color-primary-500);
+      border-radius: var(--radius-sm);
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+
+    .etitle-icon svg {
+      width: 0.875rem;
+      height: 0.875rem;
+    }
+
+    .formula-box {
+      background-color: var(--color-surface-muted);
+      border-radius: var(--radius-md);
+      padding: 0.875rem 1.125rem;
+      font-family: ui-monospace, "Courier New", monospace;
+      font-size: 0.9375rem;
+      color: var(--color-primary-500);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      border-left: 3px solid var(--color-primary-400);
+      margin-bottom: 0.875rem;
+    }
+
+    [dir="rtl"] .formula-box {
+      border-left: none;
+      border-right: 3px solid var(--color-primary-400);
+    }
+
+    [data-theme="dark"] .formula-box {
+      background: rgba(31, 95, 204, 0.12);
+    }
+
+    .erow {
+      display: flex;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 0.375rem;
+      font-size: 0.8125rem;
+      padding: 0.3125rem 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .erow:last-child {
+      border-bottom: none;
+    }
+
+    .erow-k {
+      font-family: ui-monospace, monospace;
+      font-weight: 700;
+      color: var(--color-secondary-600);
+      min-width: 3.5rem;
+      flex-shrink: 0;
+    }
+
+    .erow-v {
+      color: var(--color-text-muted);
+    }
+
+    .erow-n {
+      font-weight: 800;
+      color: var(--color-text);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .entropy-info-text {
+      font-size: 0.9375rem;
+      line-height: 1.75;
+      color: var(--color-text-muted);
+    }
+
+    .entropy-info-text strong {
+      color: var(--color-text);
+    }
+
+    /* ============================================================
+       EMPTY STATE
+    ============================================================ */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 1rem;
+      text-align: center;
+      color: var(--color-text-subtle);
+      gap: 0.75rem;
+    }
+
+    .empty-icon {
+      width: 3.5rem;
+      height: 3.5rem;
+      border-radius: 50%;
+      background: var(--color-surface-muted);
+      display: grid;
+      place-items: center;
+    }
+
+    .empty-icon svg {
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+
+    .empty-state p {
+      font-size: 0.9375rem;
+      font-weight: 600;
+    }
+
+    /* ============================================================
+       RESULTS PANEL
+    ============================================================ */
+    .results-panel {
+      transition: opacity 0.3s var(--ease-out);
+    }
+
+    .results-panel.hidden {
+      opacity: 0;
+      pointer-events: none;
+      display: none;
+    }
+
+    /* ============================================================
+       FOOTER
+    ============================================================ */
+    .site-footer {
+      margin-top: auto;
+      padding: 1.5rem 1rem;
+      text-align: center;
+      font-size: 0.8125rem;
+      color: var(--color-text-subtle);
+      border-top: 1px solid var(--color-border);
+    }
+
+    .site-footer a {
+      color: var(--color-brand-text);
+      font-weight: 700;
+    }
+
+    .site-footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* ============================================================
+       ANIMATIONS
+    ============================================================ */
+    @keyframes fadeSlideUp {
+      from {
+        opacity: 0;
+        transform: translateY(14px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .animate-in {
+      animation: fadeSlideUp 0.45s var(--ease-out) both;
+    }
+
+    @keyframes numFlicker {
+      0% {
+        opacity: 0.35;
+      }
+
+      100% {
+        opacity: 1;
+      }
+    }
+
+    .num-update {
+      animation: numFlicker 0.18s ease-out;
+    }
+
+    /* ============================================================
+       ABOUT MODAL
+    ============================================================ */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: rgba(0, 29, 61, 0.45);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s var(--ease-out);
+    }
+
+    .modal-backdrop.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal-card {
+      width: 100%;
+      max-width: 32rem;
+      background: var(--color-surface);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-xl);
+      border: 1px solid var(--color-border);
+      overflow: hidden;
+      transform: translateY(20px) scale(0.97);
+      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s var(--ease-out);
+      opacity: 0;
+      max-height: calc(100dvh - 2rem);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal-backdrop.open .modal-card {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.375rem 1.5rem 0;
+      flex-shrink: 0;
+    }
+
+    .modal-title {
+      font-family: var(--font-display);
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--color-text);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .modal-title-icon {
+      width: 1.75rem;
+      height: 1.75rem;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, var(--color-primary-200), var(--color-secondary-200));
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+
+    .modal-title-icon svg {
+      width: 1rem;
+      height: 1rem;
+      color: var(--color-primary-600);
+    }
+
+    .modal-close {
+      width: 2.25rem;
+      height: 2.25rem;
+      border-radius: 50%;
+      border: none;
+      background: var(--color-surface-muted);
+      color: var(--color-text-muted);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      transition: background-color 0.15s, color 0.15s;
+      flex-shrink: 0;
+    }
+
+    .modal-close:hover {
+      background: var(--color-border);
+      color: var(--color-text);
+    }
+
+    .modal-close svg {
+      width: 1rem;
+      height: 1rem;
+    }
+
+    .modal-body {
+      padding: 1.25rem 1.5rem 1.5rem;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+    }
+
+    .modal-divider {
+      height: 1px;
+      background: var(--color-border);
+      margin: 1.125rem 0;
+    }
+
+    .about-bio {
+      font-size: 0.9375rem;
+      line-height: 1.75;
+      color: var(--color-text-muted);
+    }
+
+    /* Social links */
+    .social-links {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.625rem;
+      margin-top: 1.25rem;
+    }
+
+    .social-links a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius-md);
+      font-size: 0.875rem;
+      font-weight: 700;
+      border: 1.5px solid;
+      text-decoration: none;
+      transition: all 0.2s var(--ease-out);
+    }
+
+    .social-links a:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .social-links a:active {
+      transform: translateY(0);
+    }
+
+    /* LinkedIn */
+    .social-links a[href*="linkedin"] {
+      background: #e8f0fb;
+      border-color: #b3c9f5;
+      color: #0a66c2;
+    }
+
+    .social-links a[href*="linkedin"]:hover {
+      background: #d0e0f9;
+    }
+
+    [data-theme="dark"] .social-links a[href*="linkedin"] {
+      background: rgba(10, 102, 194, 0.15);
+      border-color: rgba(10, 102, 194, 0.35);
+      color: #5a9ff5;
+    }
+
+    /* GitHub */
+    .social-links a[href*="github"] {
+      background: #f0f0f5;
+      border-color: #c8c8d8;
+      color: #1b1f23;
+    }
+
+    .social-links a[href*="github"]:hover {
+      background: #e4e4ec;
+    }
+
+    [data-theme="dark"] .social-links a[href*="github"] {
+      background: rgba(200, 200, 220, 0.12);
+      border-color: rgba(200, 200, 220, 0.25);
+      color: #e2eaf4;
+    }
+
+    /* Mail */
+    .social-links a[href*="mailto:"],
+    .social-links a#mail-btn {
+      background: #f3f0ff;
+      border-color: #d1c1ff;
+      color: #5b36e5;
+    }
+
+    .social-links a[href*="mailto:"]:hover,
+    .social-links a#mail-btn:hover {
+      background: #e6e0ff;
+    }
+
+    [data-theme="dark"] .social-links a[href*="mailto:"],
+    [data-theme="dark"] .social-links a#mail-btn {
+      background: rgba(109, 74, 255, 0.15);
+      border-color: rgba(109, 74, 255, 0.3);
+      color: #b19cff;
+    }
+
+    @keyframes text-pop {
+      0% {
+        transform: scale(0.95);
+        opacity: 0;
+      }
+
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    .text-pop-anim {
+      animation: text-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+      display: inline-block;
+    }
+
+    /* Telegram */
+    .social-links a[href*="t.me"] {
+      background: #e5f3fb;
+      border-color: #9cd0ef;
+      color: #0088cc;
+    }
+
+    .social-links a[href*="t.me"]:hover {
+      background: #cce8f8;
+    }
+
+    [data-theme="dark"] .social-links a[href*="t.me"] {
+      background: rgba(0, 136, 204, 0.15);
+      border-color: rgba(0, 136, 204, 0.3);
+      color: #4db8f5;
+    }
+
+    .social-links a .soc-icon {
+      width: 1.125rem;
+      height: 1.125rem;
+      flex-shrink: 0;
+    }
+
+    /* ============================================================
+       RTL SUPPORT
+    ============================================================ */
+    [dir="rtl"] .hero-subtitle {
+      direction: rtl;
+    }
+
+    [dir="rtl"] .erow {
+      direction: rtl;
+    }
+
+    [dir="rtl"] .charset-row {
+      direction: rtl;
+    }
+
+    [dir="rtl"] .modal-body {
+      direction: rtl;
+      text-align: right;
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--color-neutral-300);
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--color-neutral-400);
+    }
+
+    @media (max-width: 400px) {
+      .metric-card {
+        padding: 0.875rem;
+      }
+
+      .metric-value {
+        font-size: 1.125rem;
+      }
+
+      .charset-badge {
+        font-size: 0.6875rem;
+        padding: 0.1875rem 0.5rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ============================================================
+       ABOUT MODAL
+  ============================================================ -->
+  <div id="about-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modal-title-text">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modal-title-text">
+          <span class="modal-title-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path fill-rule="evenodd" clip-rule="evenodd"
+                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3a3 3 0 110 6 3 3 0 010-6zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08a7.2 7.2 0 01-6 3.22z"
+                fill="currentColor" />
+            </svg>
+          </span>
+          <span data-i18n="about_title">About</span>
+        </h2>
+        <button class="modal-close focus-ring" id="modal-close-btn" aria-label="Close modal">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <p class="about-bio" id="about-bio-text"></p>
+
+        <div class="modal-divider"></div>
+
+        <div class="social-links">
+          <a href="https://www.linkedin.com/in/khaled-wahdan-41ba67438/" target="_blank" rel="noopener noreferrer">
+            <svg class="soc-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path
+                d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+            </svg>
+            <span data-i18n="soc_linkedin">LinkedIn</span>
+          </a>
+          <a href="https://github.com/v-dll" target="_blank" rel="noopener noreferrer">
+            <svg class="soc-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path
+                d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
+            </svg>
+            <span data-i18n="soc_github">GitHub</span>
+          </a>
+          <a href="#" id="mail-btn" title="Show Email">
+            <svg class="soc-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path
+                d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
+            </svg>
+            <span data-en="Mail" data-ar="البريد الإلكتروني">Mail</span>
+          </a>
+          <a href="https://t.me/rrukw" target="_blank" rel="noopener noreferrer">
+            <svg class="soc-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path
+                d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" />
+            </svg>
+            <span data-i18n="soc_telegram">Telegram</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       SITE HEADER
+  ============================================================ -->
+  <header class="site-header">
+    <nav class="site-nav">
+      <a href="#" class="nav-logo focus-ring" aria-label="Pathy × Khaled Wahdan — Home">
+        <svg viewBox="0 0 840 605" class="nav-logo-svg" aria-hidden="true">
+          <path
+            d="M164.615 515.178C125.155 548.012 53.0908 563.927 23.6181 510.158C-6.73959 454.767 50.5994 382.51 101.632 362.579C141.315 347.08 194.698 352.836 209.133 399.005C222.847 442.876 197.383 487.906 164.608 515.17L164.615 515.178Z"
+            fill="url(#pathy-grad)" />
+          <path
+            d="M165.649 187.118C207.728 183.623 222.698 217.617 212.666 254.215C204.544 283.829 179.318 310.877 151.43 323.126C96.5672 347.221 52.2132 308.371 80.615 252.311C96.3664 221.217 129.506 190.123 165.649 187.126V187.118Z"
+            fill="url(#pathy-grad)" />
+          <path
+            d="M242.875 48.0844C264.368 69.9045 247.374 107.022 230.477 126.262C212.48 146.758 174.871 167.939 148.195 152.812C114 133.416 139.367 82.049 160.942 61.9321C180.092 44.0759 220.794 25.6694 242.875 48.0844Z"
+            fill="url(#pathy-grad)" />
+          <path
+            d="M352.295 0.435731C395.503 -4.43548 406.793 32.4221 391.026 66.6842C378.235 94.491 341.288 123.451 309.287 116.653C277.642 109.938 276.148 76.2258 287.117 51.2748C297.626 27.3873 325.886 3.41052 352.295 0.435731Z"
+            fill="url(#pathy-grad)" />
+          <path
+            d="M469.799 45.7934C520.549 40.4091 521.359 93.4049 495.271 123.324C477.206 144.043 433.871 160.851 413.464 135.186C385.739 100.329 433.945 49.5937 469.799 45.7934Z"
+            fill="url(#pathy-grad)" />
+          <path
+            d="M509.936 150.633C551.055 144.185 557.681 189.833 541.491 217.885C527.502 242.122 482.025 268.323 459.922 241.193C434.302 209.749 476.641 155.854 509.936 150.633Z"
+            fill="url(#pathy-grad)" />
+          <path
+            d="M425.043 305.582C410.251 324.353 376.51 342.424 355.091 324.457C329.471 302.971 353.247 263.265 376.041 249.514C423.861 220.666 458.904 262.611 425.043 305.589V305.582Z"
+            fill="url(#pathy-grad)" />
+          <path
+            d="M228.559 312.862C245.515 294.21 289.832 271.967 306.513 301.64C321.58 328.45 293.246 362.668 268.607 371.882C224.855 388.258 196.714 347.89 228.559 312.862Z"
+            fill="url(#pathy-grad)" />
+          <path
+            d="M327.188 522.73C330.406 522.73 333.969 522.407 337.875 521.751C341.776 521.084 344.677 520.178 346.583 519.021V496.209L326.042 497.917C320.719 498.308 316.344 499.454 312.917 501.355C309.5 503.245 307.792 506.094 307.792 509.896C307.792 513.704 309.26 516.792 312.208 519.167C315.151 521.542 320.146 522.73 327.188 522.73ZM324.896 410.646C335.156 410.646 344.521 411.699 352.979 413.792C361.448 415.876 368.677 419.058 374.667 423.334C380.651 427.615 385.26 433.037 388.5 439.605C391.734 446.162 393.354 453.907 393.354 462.834V526.73C393.354 531.678 391.969 535.719 389.208 538.855C386.458 541.995 383.177 544.704 379.375 546.98C367.01 554.396 349.615 558.105 327.188 558.105C317.104 558.105 308.021 557.152 299.938 555.251C291.854 553.35 284.906 550.501 279.104 546.709C273.312 542.907 268.844 538.058 265.708 532.167C262.568 526.266 261 519.412 261 511.605C261 498.495 264.896 488.428 272.688 481.396C280.49 474.355 292.568 469.975 308.917 468.251L346.292 464.271V462.271C346.292 456.761 343.865 452.813 339.021 450.438C334.172 448.063 327.188 446.876 318.062 446.876C310.823 446.876 303.781 447.641 296.938 449.167C290.104 450.683 283.922 452.579 278.396 454.855C275.938 453.146 273.844 450.537 272.125 447.021C270.417 443.495 269.562 439.829 269.562 436.021C269.562 431.079 270.75 427.136 273.125 424.188C275.5 421.245 279.156 418.725 284.104 416.626C289.615 414.542 296.13 413.032 303.646 412.084C311.156 411.126 318.24 410.646 324.896 410.646Z"
+            fill="var(--color-mint)" />
+          <path
+            d="M471.495 505.917C471.495 510.865 473.062 514.386 476.203 516.48C479.339 518.563 483.766 519.605 489.474 519.605C492.318 519.605 495.266 519.37 498.307 518.896C501.349 518.412 504.016 517.792 506.307 517.042C508.016 519.126 509.484 521.454 510.724 524.021C511.958 526.594 512.578 529.683 512.578 533.292C512.578 540.516 509.87 546.412 504.453 550.98C499.036 555.532 489.479 557.813 475.786 557.813C459.047 557.813 446.161 554.011 437.12 546.417C428.089 538.808 423.578 526.449 423.578 509.334V387.251C425.672 386.683 428.667 386.063 432.557 385.396C436.458 384.73 440.599 384.396 444.974 384.396C453.349 384.396 459.859 385.876 464.516 388.834C469.167 391.782 471.495 398.001 471.495 407.501V425.751H508.87C510.005 427.85 511.099 430.469 512.141 433.605C513.193 436.745 513.724 440.219 513.724 444.021C513.724 450.678 512.245 455.475 509.286 458.417C506.339 461.365 502.396 462.834 497.453 462.834H471.495V505.917Z"
+            fill="var(--color-mint)" />
+          <path
+            d="M674.021 553.25C672.115 553.818 669.115 554.385 665.021 554.958C660.938 555.542 656.709 555.833 652.334 555.833C648.151 555.833 644.396 555.542 641.063 554.958C637.74 554.385 634.938 553.25 632.646 551.542C630.365 549.833 628.61 547.51 627.375 544.562C626.136 541.62 625.521 537.766 625.521 533V469.688C625.521 461.896 623.568 456.432 619.667 453.292C615.776 450.156 610.979 448.583 605.271 448.583C601.464 448.583 597.844 449.062 594.417 450.021C591 450.969 588.25 452.099 586.167 453.417V553.25C584.261 553.818 581.261 554.385 577.167 554.958C573.084 555.542 568.854 555.833 564.479 555.833C560.297 555.833 556.542 555.542 553.209 554.958C549.886 554.385 547.084 553.25 544.792 551.542C542.511 549.833 540.756 547.51 539.521 544.562C538.282 541.62 537.667 537.766 537.667 533V367.562C539.761 367.188 542.854 366.667 546.938 366C551.032 365.333 555.172 365 559.354 365C563.532 365 567.282 365.286 570.604 365.854C573.938 366.427 576.74 367.573 579.021 369.292C581.313 371 583.073 373.328 584.313 376.271C585.547 379.219 586.167 383.073 586.167 387.833V415.771C588.636 414.828 592.386 413.74 597.417 412.5C602.459 411.266 608.026 410.646 614.125 410.646C632.943 410.646 647.631 415.354 658.188 424.771C668.74 434.177 674.021 448.198 674.021 466.833V553.25Z"
+            fill="var(--color-mint)" />
+          <path
+            d="M725.627 518.167C723.543 513.417 721.314 508.099 718.939 502.208C716.564 496.307 714.09 489.557 711.522 481.958C708.95 474.349 706.283 465.646 703.522 455.854C700.772 446.062 697.877 434.792 694.835 422.042C697.486 419.391 701.049 417.062 705.522 415.062C709.991 413.062 714.887 412.062 720.21 412.062C726.877 412.062 732.387 413.448 736.752 416.208C741.127 418.958 744.361 424.141 746.46 431.75L768.981 510.188H770.127C772.418 503.719 774.653 496.682 776.835 489.083C779.012 481.474 781.153 473.625 783.252 465.542C785.345 457.458 787.299 449.385 789.106 441.312C790.908 433.229 792.481 425.286 793.814 417.479C800.647 413.87 808.153 412.062 816.335 412.062C822.986 412.062 828.502 413.495 832.877 416.354C837.252 419.203 839.439 424.146 839.439 431.188C839.439 436.312 838.772 442.25 837.439 449C836.106 455.75 834.345 462.932 832.168 470.542C829.986 478.156 827.418 486 824.46 494.083C821.512 502.156 818.424 510.094 815.189 517.896C811.965 525.688 808.637 533.057 805.21 540C801.793 546.932 798.465 553.156 795.231 558.667C789.908 567.984 784.965 575.589 780.397 581.479C775.84 587.38 771.465 591.99 767.272 595.312C763.09 598.646 758.908 600.927 754.731 602.167C750.549 603.401 746.174 604.021 741.606 604.021C733.616 604.021 727.153 601.646 722.21 596.896C717.262 592.146 714.319 585.964 713.377 578.354C719.46 573.604 725.543 568.323 731.627 562.521C737.71 556.729 743.22 550.792 748.168 544.708C744.929 543.75 741.46 541.516 737.752 538C734.043 534.49 730.002 527.875 725.627 518.167Z"
+            fill="var(--color-mint)" />
+        </svg>
+        <span class="nav-title" data-i18n="nav_title_name">× Khaled Wahdan</span>
+      </a>
+
+      <div class="nav-controls">
+        <button type="button" id="about-btn" class="about-nav-btn focus-ring" aria-expanded="false"
+          aria-controls="about-modal">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path fill-rule="evenodd" clip-rule="evenodd"
+              d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3a3 3 0 110 6 3 3 0 010-6zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08a7.2 7.2 0 01-6 3.22z"
+              fill="currentColor" />
+          </svg>
+          <span data-i18n="nav_about">About</span>
+        </button>
+        <button type="button" id="lang-toggle-btn" class="lang-toggle focus-ring" aria-label="Switch language">
+          <span id="lt-en" class="lang-active">EN</span><span class="lang-sep">/</span><span id="lt-ar">AR</span>
+        </button>
+        <button id="theme-btn" type="button" class="icon-btn focus-ring" aria-label="Toggle dark mode"
+          aria-pressed="false">
+          <svg id="icon-sun" viewBox="0 0 24 24" fill="none" width="20" height="20" style="display:none"
+            aria-hidden="true">
+            <circle cx="12" cy="12" r="4.5" stroke="currentColor" stroke-width="1.5" />
+            <path
+              d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"
+              stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+          </svg>
+          <svg id="icon-moon" viewBox="0 0 24 24" fill="none" width="20" height="20" aria-hidden="true">
+            <path fill-rule="evenodd" clip-rule="evenodd"
+              d="M10.5163 2.04299C10.6958 2.27652 10.722 2.59348 10.5832 2.85329C9.99927 3.94693 9.66792 5.1961 9.66792 6.52489C9.66792 10.8367 13.1633 14.3321 17.4751 14.3321C18.8039 14.3321 20.0531 14.0008 21.1467 13.4168C21.4065 13.2781 21.7235 13.3043 21.957 13.4837C22.1906 13.6632 22.2974 13.9628 22.2302 14.2495C21.1556 18.835 17.0409 22.25 12.1269 22.25C6.39589 22.25 1.75 17.6041 1.75 11.8732C1.75 6.95909 5.16505 2.84448 9.7505 1.76982C10.0373 1.70261 10.3368 1.80947 10.5163 2.04299Z"
+              fill="currentColor" />
+          </svg>
+        </button>
+        <a href="https://pathy.live" target="_blank" rel="noopener noreferrer" class="btn"
+          style="font-size:0.875rem;height:2.625rem;" id="nav-cta">
+          <span data-i18n="nav_cta">Try Pathy</span>
+        </a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- ============================================================
+       MAIN
+  ============================================================ -->
+  <main id="main-content" class="fade-content" style="flex:1; overflow-x: clip;">
+    <section class="hero-section grain section-padding" style="position:relative;">
+      <div class="hero-glow" aria-hidden="true"></div>
+
+      <div class="hero-inner max-w-content">
+
+        <div class="hero-badges-wrapper animate-in"
+          style="animation-delay:0s; display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.5rem; align-items: center;">
+          <div class="hero-badge" style="margin-bottom: 0;">
+            <span class="hero-badge-dot" aria-hidden="true"></span>
+            <span data-i18n="hero_badge">Security Analysis Tool</span>
+          </div>
+          <a href="https://github.com/v-dll/cryptographic-entropy-visualizer" target="_blank" rel="noopener noreferrer"
+            class="github-promo-link focus-ring">
+            <svg viewBox="0 0 24 24" fill="currentColor" style="width:1.125rem; height:1.125rem;" aria-hidden="true">
+              <path
+                d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
+            </svg>
+            <span data-en="Check out the project on GitHub!" data-ar="حيّاك في جيت هب المشروع!">Check out the project on
+              GitHub!</span>
+          </a>
+        </div>
+
+        <h1 class="hero-title animate-in" style="animation-delay:0.06s">
+          <span data-i18n="hero_title_1">Interactive Password</span>
+          <span class="brand-gradient" data-i18n="hero_title_2">Entropy</span>
+          <span data-i18n="hero_title_3">Calculator</span>
+        </h1>
+
+        <p class="hero-subtitle animate-in" style="animation-delay:0.12s" data-i18n="hero_subtitle">
+          Type a password and instantly see its cryptographic entropy score,
+          active character pool size, and how long a 100 billion-guess-per-second
+          GPU cluster would take to brute-force it.
+        </p>
+
+        <div class="input-wrapper animate-in" style="animation-delay:0.18s">
+          <label for="pw-input" class="input-label" data-i18n="input_label">Enter your password</label>
+          <div class="password-field-wrap">
+            <input id="pw-input" type="password" class="password-input focus-ring" autocomplete="off" autocorrect="off"
+              autocapitalize="off" spellcheck="false" data-i18n-placeholder="input_placeholder" />
+            <button type="button" id="vis-btn" class="toggle-visibility focus-ring" aria-label="Show password">
+              <svg id="eye-open" viewBox="0 0 24 24" fill="none" width="20" height="20" aria-hidden="true">
+                <path fill-rule="evenodd" clip-rule="evenodd"
+                  d="M12 4.5C7.306 4.5 3.253 7.256 1.293 11.293a1.5 1.5 0 000 1.414C3.253 16.744 7.306 19.5 12 19.5s8.747-2.756 10.707-6.793a1.5 1.5 0 000-1.414C20.747 7.256 16.694 4.5 12 4.5zM12 16.5a4.5 4.5 0 110-9 4.5 4.5 0 010 9zM12 9a3 3 0 100 6 3 3 0 000-6z"
+                  fill="currentColor" />
+              </svg>
+              <svg id="eye-closed" viewBox="0 0 24 24" fill="none" width="20" height="20" aria-hidden="true"
+                style="display:none">
+                <path
+                  d="M3 3l18 18M10.477 10.477A3 3 0 0013.52 13.52M6.5 6.5A9.96 9.96 0 001.293 11.293a1.5 1.5 0 000 1.414C3.253 16.744 7.306 19.5 12 19.5c1.6 0 3.12-.34 4.5-.93M9.5 4.68A9.96 9.96 0 0112 4.5c4.694 0 8.747 2.756 10.707 6.793a1.5 1.5 0 010 1.414A9.975 9.975 0 0119.5 16.5"
+                  stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="charset-row animate-in" style="animation-delay:0.22s" aria-live="polite">
+          <span id="b-lower" class="charset-badge inactive"><span class="bdot"></span><span
+              data-i18n="badge_lower">Lowercase (a–z) +26</span></span>
+          <span id="b-upper" class="charset-badge inactive"><span class="bdot"></span><span
+              data-i18n="badge_upper">Uppercase (A–Z) +26</span></span>
+          <span id="b-number" class="charset-badge inactive"><span class="bdot"></span><span
+              data-i18n="badge_number">Numbers (0–9) +10</span></span>
+          <span id="b-symbol" class="charset-badge inactive"><span class="bdot"></span><span
+              data-i18n="badge_symbol">Symbols (!@#…) +32</span></span>
+        </div>
+
+        <div id="empty-state" class="empty-state card animate-in" style="animation-delay:0.26s">
+          <div class="empty-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" width="24" height="24">
+              <path fill-rule="evenodd" clip-rule="evenodd"
+                d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm3 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"
+                fill="currentColor" />
+            </svg></div>
+          <p data-i18n="empty_state">Start typing a password above to see your security analysis</p>
+        </div>
+
+        <div id="results-panel" class="results-panel hidden" aria-live="polite">
+          <div class="strength-section">
+            <div class="strength-header">
+              <span class="strength-label-text" data-i18n="strength_label">Password Strength</span>
+              <span id="s-name" class="strength-name"></span>
+            </div>
+            <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"
+              id="progress-wrap">
+              <div id="progress-fill" class="progress-fill" style="width:0%"></div>
+            </div>
+          </div>
+
+          <div class="metrics-grid">
+            <div class="card metric-card mc-blue">
+              <div class="metric-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path fill-rule="evenodd" clip-rule="evenodd"
+                    d="M3 4.75A.75.75 0 013.75 4h16.5a.75.75 0 01.75.75v14.5a.75.75 0 01-.75.75H3.75A.75.75 0 013 19.25V4.75zm1.5.75v13h15v-13h-15zM8 9a1 1 0 100 2 1 1 0 000-2zm-1 5a1 1 0 112 0 1 1 0 01-2 0zm5-5a1 1 0 100 2 1 1 0 000-2zm-1 5a1 1 0 112 0 1 1 0 01-2 0zm5-5a1 1 0 100 2 1 1 0 000-2zm-1 5a1 1 0 112 0 1 1 0 01-2 0z"
+                    fill="currentColor" />
+                </svg></div>
+              <span class="metric-label" data-i18n="m_entropy_label">Entropy Score</span>
+              <span id="m-entropy" class="metric-value" aria-live="polite">0</span>
+              <span class="metric-sub" data-i18n="m_entropy_sub">bits (E = L × log₂R)</span>
+            </div>
+            <div class="card metric-card mc-mint">
+              <div class="metric-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" stroke-width="1.5" />
+                  <path d="M9 9h6M9 12h6M9 15h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                </svg></div>
+              <span class="metric-label" data-i18n="m_pool_label">Character Pool (R)</span>
+              <span id="m-pool" class="metric-value" aria-live="polite">0</span>
+              <span class="metric-sub" data-i18n="m_pool_sub">possible symbols</span>
+            </div>
+            <div class="card metric-card mc-amber">
+              <div class="metric-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                </svg></div>
+              <span class="metric-label" data-i18n="m_len_label">Length (L)</span>
+              <span id="m-len" class="metric-value" aria-live="polite">0</span>
+              <span class="metric-sub" data-i18n="m_len_sub">characters</span>
+            </div>
+            <div class="card metric-card mc-purple">
+              <div class="metric-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path fill-rule="evenodd" clip-rule="evenodd"
+                    d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23L12.5 13V7z"
+                    fill="currentColor" />
+                </svg></div>
+              <span class="metric-label" data-i18n="m_ks_label">Keyspace (R<sup>L</sup>)</span>
+              <span id="m-keyspace" class="metric-value" style="font-size:clamp(0.8rem,2vw,1.25rem)"
+                aria-live="polite">0</span>
+              <span class="metric-sub" data-i18n="m_ks_sub">total combinations</span>
+            </div>
+          </div>
+
+          <div class="crack-card">
+            <span class="crack-label" data-i18n="crack_label">⚡ Estimated Time to Crack</span>
+            <span id="m-crack" class="crack-value" aria-live="polite">—</span>
+            <span class="crack-rate" data-i18n="crack_rate">Assuming 10¹¹ (100,000,000,000) guesses/sec — modern offline
+              GPU cluster</span>
+          </div>
+
+          <!-- Formula explainer -->
+          <div class="card explainer-card">
+            <div class="explainer-title">
+              <span class="etitle-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none">
+                  <path fill-rule="evenodd" clip-rule="evenodd"
+                    d="M12 1.25C6.063 1.25 1.25 6.063 1.25 12S6.063 22.75 12 22.75 22.75 17.937 22.75 12 17.937 1.25 12 1.25zm0 18.5C6.892 19.75 2.75 15.608 2.75 12S6.892 4.25 12 4.25 21.25 8.392 21.25 12 17.108 19.75 12 19.75zm.75-10a.75.75 0 00-1.5 0v5.25a.75.75 0 001.5 0V9.75zM12 7a1 1 0 100 2 1 1 0 000-2z"
+                    fill="currentColor" />
+                </svg></span>
+              <span data-i18n="explainer_title">How the math works</span>
+            </div>
+            <div class="formula-box" id="formula-box">E = L × log₂(R)</div>
+            <div>
+              <div class="erow"><span class="erow-k">E</span><span class="erow-v" data-i18n="e_row_E">= Entropy in bits
+                  — measures unpredictability of the password</span></div>
+              <div class="erow"><span class="erow-k">L</span><span class="erow-v" data-i18n="e_row_L">= Password length
+                  =</span><span id="e-l" class="erow-n">0</span><span class="erow-v"
+                  data-i18n="e_row_chars">characters</span></div>
+              <div class="erow"><span class="erow-k">R</span><span class="erow-v" data-i18n="e_row_R">= Active character
+                  pool =</span><span id="e-r" class="erow-n">0</span><span class="erow-v"
+                  data-i18n="e_row_symbols">symbols</span></div>
+              <div class="erow"><span class="erow-k">log₂(R)</span><span class="erow-v" data-i18n="e_row_log2r">= Bits
+                  per character position =</span><span id="e-log2r" class="erow-n">0</span><span class="erow-v"
+                  data-i18n="e_row_bits">bits</span></div>
+              <div class="erow"><span class="erow-k" style="color:var(--color-primary-500)">Keyspace</span><span
+                  class="erow-v" data-i18n="e_row_ks_eq">= R<sup>L</sup> =</span><span id="e-ks"
+                  class="erow-n">0</span><span class="erow-v" data-i18n="e_row_ks_desc">total possible passwords</span>
+              </div>
+              <div class="erow"><span class="erow-k" style="color:var(--color-primary-500)">Time</span><span
+                  class="erow-v" data-i18n="e_row_time">= (Keyspace ÷ 2) ÷ 10¹¹ guesses/sec (average-case brute
+                  force)</span></div>
+            </div>
+          </div>
+
+          <!-- Educational: What is Entropy? -->
+          <div class="card explainer-card">
+            <div class="explainer-title">
+              <span class="etitle-icon" aria-hidden="true"
+                style="background:var(--color-secondary-100); color:var(--color-secondary-600)">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path fill-rule="evenodd" clip-rule="evenodd"
+                    d="M11.25 15.25a.75.75 0 001.5 0V11a.75.75 0 00-1.5 0v4.25zM12 9.5a1 1 0 100-2 1 1 0 000 2zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18.5c-4.687 0-8.5-3.813-8.5-8.5S7.313 3.5 12 3.5s8.5 3.813 8.5 8.5-3.813 8.5-8.5 8.5z"
+                    fill="currentColor" />
+                </svg>
+              </span>
+              <span data-i18n="entropy_info_title">Understanding Entropy & Results</span>
+            </div>
+            <div class="entropy-info-text" id="entropy-info-body">
+              <!-- Dynamically populated by JS translations -->
+            </div>
+          </div>
+
+        </div><!-- /results-panel -->
+      </div><!-- /hero-inner -->
+    </section>
+  </main>
+
+  <!-- ============================================================
+       FOOTER
+  ============================================================ -->
+  <footer class="site-footer section-padding" id="site-footer">
+    <!-- Populated by JS -->
+  </footer>
+
+  <script>
+    (function () {
+      'use strict';
+
+      /* ==============================================================
+         TRANSLATIONS DICTIONARY
+      ============================================================== */
+      const translations = {
+        en: {
+          nav_title_name: '× Khaled Wahdan',
+          nav_about: 'About',
+          nav_cta: 'Try Pathy',
+
+          hero_badge: 'Security Analysis Tool',
+          hero_title_1: 'Interactive Password',
+          hero_title_2: 'Entropy',
+          hero_title_3: 'Calculator',
+          hero_subtitle: 'Type a password and instantly see its cryptographic entropy score, active character pool size, and how long a 100 billion-guess-per-second GPU cluster would take to brute-force it.',
+
+          input_label: 'Enter your password',
+          input_placeholder: 'Type or paste any password…',
+
+          badge_lower: 'Lowercase (a–z) +26',
+          badge_upper: 'Uppercase (A–Z) +26',
+          badge_number: 'Numbers (0–9) +10',
+          badge_symbol: 'Symbols (!@#…) +32',
+
+          strength_label: 'Password Strength',
+          strength_very_weak: 'Very Weak',
+          strength_weak: 'Weak',
+          strength_fair: 'Reasonable', /* updated based on prompt text for 36-59 bits */
+          strength_strong: 'Strong',
+          strength_very_strong: 'Very Strong',
+
+          empty_state: 'Start typing a password above to see your security analysis',
+
+          m_entropy_label: 'Entropy Score',
+          m_entropy_sub: 'bits (E = L × log₂R)',
+          m_pool_label: 'Character Pool (R)',
+          m_pool_sub: 'possible symbols',
+          m_len_label: 'Length (L)',
+          m_len_sub: 'characters',
+          m_ks_label: 'Keyspace (R^L)',
+          m_ks_sub: 'total combinations',
+
+          crack_label: '⚡ Estimated Time to Crack',
+          crack_rate: 'Assuming 10¹¹ (100,000,000,000) guesses/sec — modern offline GPU cluster',
+
+          explainer_title: 'How the math works',
+          e_row_E: '= Entropy in bits — measures unpredictability of the password',
+          e_row_L: '= Password length =',
+          e_row_chars: 'characters',
+          e_row_R: '= Active character pool =',
+          e_row_symbols: 'symbols',
+          e_row_log2r: '= Bits per character position =',
+          e_row_bits: 'bits',
+          e_row_ks_eq: '= R^L =',
+          e_row_ks_desc: 'total possible passwords',
+          e_row_time: '= (Keyspace ÷ 2) ÷ 10¹¹ guesses/sec (average-case brute force)',
+
+          about_title: 'About Me & The Project',
+          about_bio: "Hey, I'm Khaled Wahdan, a Cybersecurity undergrad at Umm Al-Qura University. I engineered this Interactive Password Entropy Calculator for Pathy's AI Software Development track. My philosophy for this project was simple: eliminate the false sense of security created by traditional password meters. Instead of hiding behind a 'black box,' this tool visualizes cryptographic entropy and explains the math to show exactly how brute-force attacks work. It merges AI development with core cybersecurity principles. I have dedicated this project to the Pathy team with full rights to use it as a public educational tool or a benchmark for future courses.",
+
+          soc_linkedin: 'LinkedIn',
+          soc_github: 'GitHub',
+          soc_whatsapp: 'WhatsApp',
+          soc_telegram: 'Telegram',
+
+          footer_html: 'Built for <a href="https://pathy.live" target="_blank" rel="noopener">Pathy</a> by Khaled Wahdan &nbsp;&middot;&nbsp; Pathy &times; Khaled Wahdan',
+
+          entropy_info_title: 'Understanding Entropy & Results',
+          entropy_info_body: `
+          <strong>What is Password Entropy?</strong><br>
+          Entropy measures the unpredictability of a password, calculated in 'bits'. It relies on both the length of your password and the variety of characters used (lowercase, uppercase, numbers, symbols). The higher the bits, the harder it is for a computer to guess.<br><br>
+          <strong>What do the scores mean?</strong><br>
+          &bull; Under 28 bits: Very Weak (Cracked instantly)<br>
+          &bull; 28 - 35 bits: Weak (Cracked in minutes)<br>
+          &bull; 36 - 59 bits: Reasonable (Takes hours to days)<br>
+          &bull; 60 - 127 bits: Strong (Takes years)<br>
+          &bull; Over 127 bits: Very Strong (Practically uncrackable)
+        `
+        },
+        ar: {
+          nav_title_name: '× خالد وهدان',
+          nav_about: 'من أنا',
+          nav_cta: 'جرّب باثي',
+
+          hero_badge: 'أداة تحليل الأمان',
+          hero_title_1: 'حاسبة الإنتروبيا',
+          hero_title_2: 'التفاعلية',
+          hero_title_3: 'لكلمات المرور',
+          hero_subtitle: 'اكتشف مدى قوة كلمة مرورك والوقت الفعلي الذي يحتاجه هجوم البروت فورس لاختراقها.',
+
+          input_label: 'أدخل كلمة المرور',
+          input_placeholder: 'أدخل أو الصق كلمة المرور هنا...',
+
+          badge_lower: 'أحرف صغيرة (a–z) +26',
+          badge_upper: 'أحرف كبيرة (A–Z) +26',
+          badge_number: 'أرقام (0–9) +10',
+          badge_symbol: 'رموز (!@#…) +32',
+
+          strength_label: 'قوة كلمة المرور',
+          strength_very_weak: 'ضعيفة جداً',
+          strength_weak: 'ضعيفة',
+          strength_fair: 'مقبولة',
+          strength_strong: 'قوية',
+          strength_very_strong: 'قوية جداً',
+
+          empty_state: 'أدخل أو الصق كلمة المرور...',
+
+          m_entropy_label: 'درجة الإنتروبيا',
+          m_entropy_sub: 'بت (E = L × log₂R)',
+          m_pool_label: 'مجموعة الأحرف الفعالة',
+          m_pool_sub: 'رمز ممكن',
+          m_len_label: 'طول الكلمة',
+          m_len_sub: 'حرف',
+          m_ks_label: 'الاحتمالات الممكنة',
+          m_ks_sub: 'احتمال ممكن',
+
+          crack_label: '⚡ الوقت المقدر للاختراق',
+          crack_rate: 'بافتراض 10¹¹ (100,000,000,000) تخمين/ثانية — كلاستر GPU حديث',
+
+          explainer_title: 'كيف تتم الحسبة الرياضية',
+          e_row_E: '= الإنتروبيا بالبت — تقيس مدى صعوبة التخمين',
+          e_row_L: '= طول كلمة المرور =',
+          e_row_chars: 'حرف',
+          e_row_R: '= مجموعة الأحرف الفعّالة =',
+          e_row_symbols: 'رمز',
+          e_row_log2r: '= بتات لكل موضع حرف =',
+          e_row_bits: 'بت',
+          e_row_ks_eq: '= R^L =',
+          e_row_ks_desc: 'كلمة مرور محتملة',
+          e_row_time: '= (الفضاء ÷ 2) ÷ 10¹¹ تخمين/ثانية (حالة متوسطة)',
+
+          about_title: 'من أنا وعن المشروع',
+          about_bio: "السلام عليكم ورحمة الله وبركاته, أنا خالد وهدان، طالب أمن سيبراني في جامعة أم القرى. طوّرت حاسبة إنتروبيا تفاعلية لكلمات المرور كجزء من مسار تطوير برمجيات الذكاء الاصطناعي مع باثي. فلسفتي في المشروع بسيطة: التخلص من الوهم الزائف بالامان اللي تعطيه مقاييس كلمات المرور العادية بدون ما توضح ايش يصير خلف الكواليس. الأداة هذي تشرح العمليات الحسابية وتمثل الإنتروبيا التشفيرية عشان تبيّن كيف تشتغل هجمات البروت فورس. المشروع يدمج بين تطوير الذكاء الاصطناعي ومبادئ الأمن السيبراني، وقدمته لفريق باثي بصلاحيات كاملة عشان يستخدمونه كأداة عامة للكل أو كمرجع وتطبيق عملي في دوراتهم الجاية.",
+
+          soc_linkedin: 'لينكد إن',
+          soc_github: 'جيت هاب',
+          soc_whatsapp: 'واتساب',
+          soc_telegram: 'تيليجرام',
+
+          footer_html: 'تم التطوير لصالح <a href="https://pathy.live" target="_blank" rel="noopener">باثي</a> بواسطة خالد وهدان &nbsp;&middot;&nbsp; باثي &times; خالد وهدان',
+
+          entropy_info_title: 'فهم الإنتروبيا ومعنى النتائج',
+          entropy_info_body: `
+          <strong>ما هي الإنتروبيا؟</strong><br>
+          تقيس إنتروبيا كلمة المرور مدى صعوبة تخمينها، وتُحسب بـ 'البت' (bits). تعتمد على طول كلمة المرور وعدد أنواع الأحرف المستخدمة (أحرف صغيرة، كبيرة، أرقام، رموز). كلما زادت الإنتروبيا، زادت صعوبة تخمين الكمبيوتر لها.<br><br>
+          <strong>ماذا تعني النتائج؟</strong><br>
+          &bull; أقل من 28 بت: ضعيفة جداً (تُخترق فوراً)<br>
+          &bull; 28 - 35 بت: ضعيفة (تُخترق في دقائق)<br>
+          &bull; 36 - 59 بت: مقبولة (تستغرق ساعات إلى أيام)<br>
+          &bull; 60 - 127 بت: قوية (تستغرق سنوات)<br>
+          &bull; أكثر من 127 بت: قوية جداً (شبه مستحيلة الاختراق)
+        `
+        }
+      };
+
+      const R_LOWER = 26, R_UPPER = 26, R_NUMBER = 10, R_SYMBOL = 32, GPU_RATE = 1e11;
+      const RE_LOWER = /[a-z]/, RE_UPPER = /[A-Z]/, RE_NUMBER = /[0-9]/, RE_SYMBOL = /[^a-zA-Z0-9]/;
+      const commonPasswords = ["password", "password123", "123456", "123456789", "admin", "admin123", "qwerty", "iloveyou"];
+
+      let currentLang = 'en';
+
+      const pwInput = document.getElementById('pw-input'), visBtn = document.getElementById('vis-btn'),
+        eyeOpen = document.getElementById('eye-open'), eyeClosed = document.getElementById('eye-closed'),
+        themeBtn = document.getElementById('theme-btn'), iconSun = document.getElementById('icon-sun'), iconMoon = document.getElementById('icon-moon'),
+        langBtn = document.getElementById('lang-toggle-btn'), ltEn = document.getElementById('lt-en'), ltAr = document.getElementById('lt-ar'),
+        aboutBtn = document.getElementById('about-btn'), modal = document.getElementById('about-modal'), modalCloseBtn = document.getElementById('modal-close-btn'),
+        aboutBio = document.getElementById('about-bio-text'), siteFooter = document.getElementById('site-footer'), entropyInfoBody = document.getElementById('entropy-info-body'),
+        mainContent = document.getElementById('main-content');
+      const bLower = document.getElementById('b-lower'), bUpper = document.getElementById('b-upper'), bNumber = document.getElementById('b-number'), bSymbol = document.getElementById('b-symbol');
+      const emptyState = document.getElementById('empty-state'), resultsPanel = document.getElementById('results-panel');
+      const mEntropy = document.getElementById('m-entropy'), mPool = document.getElementById('m-pool'), mLen = document.getElementById('m-len'), mKeyspace = document.getElementById('m-keyspace'), mCrack = document.getElementById('m-crack'), sName = document.getElementById('s-name'), pFill = document.getElementById('progress-fill'), pWrap = document.getElementById('progress-wrap');
+      const eL = document.getElementById('e-l'), eR = document.getElementById('e-r'), eLog2r = document.getElementById('e-log2r'), eKs = document.getElementById('e-ks');
+
+      function applyTranslations(lang) {
+        const t = translations[lang];
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+          const key = el.getAttribute('data-i18n');
+          if (t[key] !== undefined) el.textContent = t[key];
+        });
+        document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+          const key = el.getAttribute('data-i18n-placeholder');
+          if (t[key] !== undefined) el.setAttribute('placeholder', t[key]);
+        });
+
+        if (aboutBio) aboutBio.textContent = t.about_bio;
+        if (siteFooter) siteFooter.innerHTML = '<p>' + t.footer_html + '</p>';
+        if (entropyInfoBody) entropyInfoBody.innerHTML = t.entropy_info_body;
+
+        document.querySelectorAll('[data-en][data-ar]').forEach(el => {
+          el.textContent = el.getAttribute('data-' + lang);
+        });
+
+        const html = document.documentElement;
+        if (lang === 'ar') {
+          html.setAttribute('dir', 'rtl'); html.setAttribute('lang', 'ar');
+          ltAr.classList.add('lang-active'); ltEn.classList.remove('lang-active');
+        } else {
+          html.setAttribute('dir', 'ltr'); html.setAttribute('lang', 'en');
+          ltEn.classList.add('lang-active'); ltAr.classList.remove('lang-active');
+        }
+
+        const ksLabel = document.querySelector('.mc-purple .metric-label');
+        if (ksLabel) ksLabel.innerHTML = lang === 'ar' ? 'الاحتمالات الممكنة' : 'Keyspace (R<sup>L</sup>)';
+
+        document.querySelectorAll('[data-i18n="e_row_ks_eq"]').forEach(el => {
+          el.innerHTML = '= R<sup>L</sup> =';
+        });
+
+        refreshStrengthName();
+      }
+
+      function detectCharsets(pw) {
+        const hasLower = RE_LOWER.test(pw), hasUpper = RE_UPPER.test(pw), hasNumber = RE_NUMBER.test(pw), hasSymbol = RE_SYMBOL.test(pw);
+        let R = 0;
+        if (hasLower) R += R_LOWER; if (hasUpper) R += R_UPPER; if (hasNumber) R += R_NUMBER; if (hasSymbol) R += R_SYMBOL;
+        return { hasLower, hasUpper, hasNumber, hasSymbol, R };
+      }
+      function entropy(L, R, pw) {
+        if (pw && commonPasswords.includes(pw.toLowerCase())) return 0;
+        return (L === 0 || R === 0) ? 0 : L * Math.log2(R);
+      }
+      function keyspaceBig(L, R) { return (L === 0 || R === 0) ? BigInt(0) : BigInt(R) ** BigInt(L); }
+      function crackSeconds(E) { return (E <= 0) ? 0 : (Math.pow(2, Math.min(E, 1023)) / 2) / GPU_RATE; }
+      function formatTime(sec) {
+        const isAr = currentLang === 'ar';
+        if (sec <= 0.001) return isAr ? '<span dir="ltr">&lt; 1</span> ملي ثانية' : 'Instantly (&lt; 1 millisecond)';
+        if (sec < 1) return '<span dir="ltr">' + (sec * 1000).toFixed(2) + '</span>' + (isAr ? ' ملي ثانية' : ' ms');
+        if (sec < 60) return '<span dir="ltr">' + sec.toFixed(2) + '</span>' + (isAr ? ' ثانية' : ' seconds');
+        const MIN = 60, HR = 3600, DAY = 86400, YR = 31536000;
+        if (sec < HR) return '<span dir="ltr">' + (sec / MIN).toFixed(1) + '</span>' + (isAr ? ' دقيقة' : ' minutes');
+        if (sec < DAY) return '<span dir="ltr">' + (sec / HR).toFixed(1) + '</span>' + (isAr ? ' ساعة' : ' hours');
+        if (sec < YR) return '<span dir="ltr">' + (sec / DAY).toFixed(1) + '</span>' + (isAr ? ' أيام' : ' days');
+        if (sec < YR * 100) return '<span dir="ltr">' + (sec / YR).toFixed(1) + '</span>' + (isAr ? ' سنوات' : ' years');
+        if (sec < YR * 1e5) return '<span dir="ltr">' + (sec / (YR * 100)).toFixed(1) + '</span>' + (isAr ? ' قرن' : ' centuries');
+        if (sec < YR * 1e9) return '<span dir="ltr">' + (sec / (YR * 1e3)).toFixed(1) + '</span>' + (isAr ? ' ألفية' : ' millennia');
+        return toSciYears(sec / YR, isAr);
+      }
+      function toSciYears(y, isAr) {
+        if (!isFinite(y) || y > 1e308) return isAr ? 'أطول من عمر الكون (<span dir="ltr">&gt; 10<sup>100</sup></span> سنة)' : 'Longer than the universe will exist (&gt; 10<sup>100</sup> years)';
+        const exp = Math.floor(Math.log10(y)), m = (y / Math.pow(10, exp)).toFixed(2);
+        return '<span dir="ltr">~' + m + ' &times; 10<sup>' + exp + '</sup></span>' + (isAr ? ' سنة' : ' years');
+      }
+      function formatKeyspace(ks) {
+        const str = ks.toString();
+        if (str.length <= 15) return Number(ks).toLocaleString();
+        const exp = str.length - 1, mant = (Number(str.slice(0, 4)) / 1000).toFixed(2);
+        return '~' + mant + ' &times; 10<sup>' + exp + '</sup>';
+      }
+      function strengthLevel(E) {
+        if (E < 28) return { nameKey: 'strength_very_weak', badgeCls: 'sn-very-weak', fillCls: 'pf-very-weak', pct: Math.max(2, (E / 28) * 20) };
+        if (E < 36) return { nameKey: 'strength_weak', badgeCls: 'sn-weak', fillCls: 'pf-weak', pct: 20 + ((E - 28) / 8) * 20 };
+        if (E < 60) return { nameKey: 'strength_fair', badgeCls: 'sn-fair', fillCls: 'pf-fair', pct: 40 + ((E - 36) / 24) * 20 };
+        if (E < 128) return { nameKey: 'strength_strong', badgeCls: 'sn-strong', fillCls: 'pf-strong', pct: 60 + ((E - 60) / 68) * 20 };
+        return { nameKey: 'strength_very_strong', badgeCls: 'sn-very-strong', fillCls: 'pf-very-strong', pct: 100 };
+      }
+
+      let lastStrength = null;
+      function refreshStrengthName() {
+        if (!lastStrength) return;
+        sName.textContent = translations[currentLang][lastStrength.nameKey] || '';
+      }
+
+      function setBadge(el, active, activeClass) {
+        if (active) { el.classList.remove('inactive'); el.classList.add(activeClass); }
+        else { el.classList.add('inactive'); el.classList.remove(activeClass); }
+      }
+      function flash(el) {
+        el.classList.remove('num-update'); void el.offsetWidth; el.classList.add('num-update');
+      }
+
+      function onInput() {
+        const pw = pwInput.value, L = pw.length;
+        if (L === 0) {
+          emptyState.style.display = 'flex'; resultsPanel.classList.add('hidden');
+          setBadge(bLower, false, 'badge-lower'); setBadge(bUpper, false, 'badge-upper');
+          setBadge(bNumber, false, 'badge-number'); setBadge(bSymbol, false, 'badge-symbol');
+          lastStrength = null; return;
+        }
+        emptyState.style.display = 'none'; resultsPanel.classList.remove('hidden');
+
+        const { hasLower, hasUpper, hasNumber, hasSymbol, R } = detectCharsets(pw);
+        setBadge(bLower, hasLower, 'badge-lower'); setBadge(bUpper, hasUpper, 'badge-upper');
+        setBadge(bNumber, hasNumber, 'badge-number'); setBadge(bSymbol, hasSymbol, 'badge-symbol');
+
+        const E = entropy(L, R, pw), log2R = R > 0 ? Math.log2(R) : 0, ks = keyspaceBig(L, R);
+        const crackSec = crackSeconds(E), crackStr = formatTime(crackSec);
+        const strength = strengthLevel(E); lastStrength = strength;
+
+        const eStr = '<span dir="ltr">' + E.toFixed(2) + '</span>' + (currentLang === 'ar' ? ' بت' : ' bits');
+        if (mEntropy.innerHTML !== eStr) { mEntropy.innerHTML = eStr; flash(mEntropy); }
+        if (mPool.textContent !== R.toString()) { mPool.textContent = R.toString(); flash(mPool); }
+        if (mLen.textContent !== L.toString()) { mLen.textContent = L.toString(); flash(mLen); }
+
+        const ksStr = formatKeyspace(ks);
+        mKeyspace.innerHTML = ksStr; flash(mKeyspace);
+        mCrack.innerHTML = crackStr;
+
+        pFill.style.width = strength.pct + '%'; pFill.className = 'progress-fill ' + strength.fillCls;
+        pWrap.setAttribute('aria-valuenow', Math.round(strength.pct));
+
+        sName.textContent = translations[currentLang][strength.nameKey] || '';
+        sName.className = 'strength-name ' + strength.badgeCls;
+
+        eL.textContent = L; eR.textContent = R; eLog2r.textContent = log2R.toFixed(4); eKs.innerHTML = ksStr;
+      }
+
+      pwInput.addEventListener('input', onInput); pwInput.addEventListener('keyup', onInput);
+      visBtn.addEventListener('click', function () {
+        const hidden = pwInput.type === 'password';
+        pwInput.type = hidden ? 'text' : 'password';
+        eyeOpen.style.display = hidden ? 'none' : ''; eyeClosed.style.display = hidden ? '' : 'none';
+        visBtn.setAttribute('aria-label', hidden ? 'Hide password' : 'Show password');
+        pwInput.focus();
+      });
+
+      function setTheme(dark) {
+        if (dark) document.documentElement.setAttribute('data-theme', 'dark'); else document.documentElement.removeAttribute('data-theme');
+        iconSun.style.display = dark ? '' : 'none'; iconMoon.style.display = dark ? 'none' : '';
+        themeBtn.setAttribute('aria-pressed', String(dark));
+        try { localStorage.setItem('pathy:theme', dark ? 'dark' : 'light'); } catch (e) { }
+      }
+      (function initTheme() {
+        try {
+          const stored = localStorage.getItem('pathy:theme'), sysDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          setTheme(stored === 'dark' || (stored === 'system' && sysDark) || (!stored && sysDark));
+        } catch (e) { }
+      })();
+      themeBtn.addEventListener('click', () => setTheme(document.documentElement.getAttribute('data-theme') !== 'dark'));
+
+      /* Language Switcher with Fade Transition */
+      langBtn.addEventListener('click', function () {
+        const newLang = currentLang === 'en' ? 'ar' : 'en';
+
+        // Fade out
+        mainContent.classList.add('faded');
+
+        // Wait for fade transition, then swap and fade in
+        setTimeout(() => {
+          currentLang = newLang;
+          applyTranslations(currentLang);
+          onInput();
+
+          mainContent.classList.remove('faded');
+        }, 300); // matches the 0.3s CSS transition
+      });
+
+      function openModal() {
+        modal.classList.add('open');
+        document.body.style.overflow = 'hidden';
+        aboutBtn.setAttribute('aria-expanded', 'true');
+        modalCloseBtn.focus();
+        const mbSpan = document.querySelector('#mail-btn span');
+        if (mbSpan) {
+          mbSpan.textContent = mbSpan.getAttribute('data-' + currentLang);
+          mbSpan.classList.remove('text-pop-anim');
+        }
+      }
+      function closeModal() { modal.classList.remove('open'); document.body.style.overflow = ''; aboutBtn.setAttribute('aria-expanded', 'false'); aboutBtn.focus(); }
+      aboutBtn.addEventListener('click', openModal); modalCloseBtn.addEventListener('click', closeModal);
+      modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+      document.addEventListener('keydown', e => { if (e.key === 'Escape' && modal.classList.contains('open')) closeModal(); });
+      modal.addEventListener('keydown', e => {
+        if (e.key !== 'Tab' || !modal.classList.contains('open')) return;
+        const focusable = modal.querySelectorAll('button, a, input, [tabindex]:not([tabindex="-1"])');
+        const first = focusable[0], last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      });
+
+      const mailBtn = document.getElementById('mail-btn');
+      if (mailBtn) {
+        mailBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          const span = this.querySelector('span');
+          if (span.textContent !== 'khaled.wahdan@proton.me') {
+            span.textContent = 'khaled.wahdan@proton.me';
+            span.classList.remove('text-pop-anim');
+            void span.offsetWidth; // Trigger reflow for animation restart
+            span.classList.add('text-pop-anim');
+          } else {
+            window.location.href = 'mailto:khaled.wahdan@proton.me';
+          }
+        });
+      }
+
+      applyTranslations('en'); onInput();
+    })();
+  </script>
+</body>
+
+</html>
